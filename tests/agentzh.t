@@ -300,3 +300,22 @@ print(cjson.encode(cjson.decode(json)))
 {"val3":{"val2":"str","val1":null},"val1":"str","val2":null}
 {"val3":{"val2":"str"},"val1":"str"}
 {"val3":{"val2":"str","val1":null},"val1":"str","val2":null}
+
+
+
+=== TEST 22: / in string
+--- lua
+local cjson = require "cjson"
+local a={test = "http://google.com/google"}
+local b=cjson.encode(a)
+print(b)
+cjson.encode_escape_slash(false)
+local b=cjson.encode(a)
+print(b)
+cjson.encode_escape_slash(true)
+local b=cjson.encode(a)
+print(b)
+--- out
+{"test":"http:\/\/google.com\/google"}
+{"test":"http://google.com/google"}
+{"test":"http:\/\/google.com\/google"}
