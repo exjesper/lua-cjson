@@ -788,6 +788,16 @@ static int json_append_data(lua_State *l, json_config_t *cfg,
             lua_pushlightuserdata(l, json_lightudata_mask(&json_array));
             lua_rawget(l, LUA_REGISTRYINDEX);
             as_array = lua_rawequal(l, -1, -2);
+            // Temporary workaround for compatability with previous json library MUR-11135
+            if (as_array == 0) {
+                lua_pop(l, 1);
+                lua_getfield(l, -1, "__type");
+                size_t len = 0;
+                const char *s = lua_tolstring(l, -1, &len);
+                if (s && len == 6 &&  strncmp(s, "slice", 6) == 0) {
+                   as_array = 1;
+                }
+            }
             lua_pop(l, 2);
         }
 
@@ -1336,9 +1346,16 @@ static void json_parse_array_context(lua_State *l, json_parse_t *json)
 
     /* set array_mt on the table at the top of the stack */
     if (json->cfg->decode_array_with_array_mt) {
+        // Temporary workaround for compatability with previous json library MUR-11135
+        /*
         lua_pushlightuserdata(l, json_lightudata_mask(&json_array));
         lua_rawget(l, LUA_REGISTRYINDEX);
         lua_setmetatable(l, -2);
+        */
+       lua_newtable(l);
+       lua_pushstring(l, "slice");
+       lua_setfield(l, -2, "__type");
+       lua_setmetatable(l, -2);
     }
 
     json_next_token(json, &token);
