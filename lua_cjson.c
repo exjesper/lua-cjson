@@ -794,7 +794,7 @@ static int json_append_data(lua_State *l, json_config_t *cfg,
                 lua_getfield(l, -1, "__type");
                 size_t len = 0;
                 const char *s = lua_tolstring(l, -1, &len);
-                if (s && len == 6 &&  strncmp(s, "slice", 6) == 0) {
+                if (s && len == 5 &&  strncmp(s, "slice", 5) == 0) {
                    as_array = 1;
                 }
             }
